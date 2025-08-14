@@ -178,6 +178,49 @@
     }
 
     .error{ color:var(--danger); font-weight:600; }
+
+ label{ font-size:14px; color:var(--muted); display:block; margin-bottom:6px; }
+    input[type="text"]{
+      width:100%;
+      font-size:16px;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,.2);
+      margin-bottom:14px;
+    }
+    .btn{
+      display:inline-grid; grid-auto-flow:column; align-items:center; gap:10px;
+      padding:12px 18px;
+      border-radius:10px;
+      border:none;
+      background: linear-gradient(180deg, var(--forest-600), var(--forest-700));
+      color:white; font-weight:600;
+      cursor:pointer;
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      box-shadow: 0 8px 18px rgba(27,94,32,.25);
+    }
+    .btn:hover{ filter:saturate(1.05) brightness(1.03); }
+    .btn:active{ transform: translateY(1px); }
+    .btn[disabled]{ filter:grayscale(.2) brightness(.85); cursor:not-allowed; opacity:.9; }
+
+    .spinner{ 
+      width:18px; height:18px; border-radius:999px;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color:white; 
+      animation: spin 1s linear infinite; 
+      display:none; 
+    }
+    .btn.loading .spinner{ display:block; }
+
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    .result{ margin-top:16px; padding:12px; background:var(--mint-50); border-radius:10px; border:1px solid rgba(0,0,0,.1);}
+    fieldset{ border:none; margin:10px 0; padding:0; }
+    legend{ font-weight:600; margin-bottom:6px; }
+    .radio-group{ display:flex; flex-wrap:wrap; gap:12px; }
+    .error{ color:var(--danger); font-weight:600; }
+  
+    
   </style>
 </head>
 <body>
@@ -227,7 +270,10 @@
         </div>
       </fieldset>
 
-      <button type="submit" class="btn">Buscar</button>
+      <button type="submit" id="btnBuscar" class="btn">
+        <div class="spinner" id="spinner" aria-hidden="true"></div>
+        <span id="btnText">Buscar</span>
+      </button>
     </form>
 
 
@@ -317,6 +363,7 @@
   </script>
 </body>
 </html>
+
 
 
 
