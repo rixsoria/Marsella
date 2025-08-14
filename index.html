@@ -199,7 +199,7 @@
           <div class="input">
             <label for="codigo">CÓDIGO</label>
             <label for="codigo"> Marsella (MA) Toulouse (TO) Cannes (CA) Dijon (DI) Monaco (MO)</label>
-            <input id="codigo" name="codigo" type="text" placeholder="CODIGO+INTERIOR" autocomplete="off" required />
+            <input id="codigo" name="codigo" type="text" placeholder="CODIGO+INTERIOR" autocomplete="off" required oninput="this.value = this.value.toUpperCase()"  />
           </div>
           <button type="submit" id="btnBuscar" class="btn" aria-live="polite">
             <div class="spinner" id="spinner" aria-hidden="true"></div>
@@ -285,6 +285,7 @@
   </script>
 </body>
 </html>
+
 
 
 
