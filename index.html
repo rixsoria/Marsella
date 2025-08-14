@@ -1,24 +1,286 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Buscador</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acceso Marsella Lucerna</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --forest-900:#0f3d1e;   /* bosque muy oscuro */
+      --forest-800:#154e27;
+      --forest-700:#1b5e20;   /* verde bosque principal */
+      --forest-600:#236d2a;
+      --forest-500:#2e7d32;
+      --forest-300:#69a66e;
+      --mint-50:#f3fbf5;
+      --mint-100:#e6f5ea;
+      --text:#0b1a10;
+      --muted:#5f6f64;
+      --white:#ffffff;
+      --danger:#b00020;
+    }
+
+    html, body{
+      height:100%;
+      margin:0;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 50% -10%, var(--mint-100), var(--mint-50)) fixed;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    .wrap{
+      min-height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .card{
+      width:min(720px, 94vw);
+      background:var(--white);
+      border:1px solid rgba(0,0,0,.06);
+      border-radius:24px;
+      box-shadow: 0 10px 30px rgba(27,94,32,.12);
+      overflow:hidden;
+    }
+
+    .header{
+      background: linear-gradient(135deg, var(--forest-700), var(--forest-500));
+      color:white;
+      padding:28px 24px 20px;
+      text-align:center;
+      position:relative;
+      isolation:isolate;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand h1{
+      font-family: Merriweather, Georgia, serif;
+      font-weight:700;
+      letter-spacing:.3px;
+      margin:0;
+      font-size: clamp(22px, 3.6vw, 34px);
+      text-transform: none;
+    }
+
+    .brand small{
+      opacity:.95;
+      font-weight:300;
+    }
+
+    .logo{
+      width:86px; height:86px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:999px;
+      box-shadow: inset 0 0 0 6px rgba(255,255,255,.06);
+    }
+
+    /* Hace blanca la silueta SVG externa */
+    .logo-mark{ width:54px; height:54px; filter: invert(1) brightness(12) grayscale(1); opacity:.95; }
+
+    .body{
+      padding:28px 24px 26px;
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    label{
+      font-size:14px; color:var(--muted);
+      display:block; margin-bottom:6px;
+    }
+
+    .input{
+      grid-column:1 / -1;
+    }
+
+    @media(min-width:560px){
+      .input{ grid-column:1 / span 1; }
+    }
+
+    input[type="text"]{
+      width:100%;
+      font-size:16px;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid rgba(21,78,39,.25);
+      outline:none;
+      background: white;
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    input[type="text"]:focus{
+      border-color: var(--forest-500);
+      box-shadow: 0 0 0 4px rgba(46,125,50,.18);
+    }
+
+    .btn{
+      display:inline-grid; grid-auto-flow:column; align-items:center; gap:10px;
+      padding:14px 18px; 
+      border-radius:14px;
+      border:1px solid var(--forest-700);
+      background: linear-gradient(180deg, var(--forest-600), var(--forest-800));
+      color:white;
+      font-weight:600;
+      cursor:pointer;
+      transition: transform .06s ease, filter .2s ease, box-shadow .2s ease;
+      box-shadow: 0 8px 18px rgba(27,94,32,.25);
+    }
+    .btn:hover{ filter:saturate(1.05) brightness(1.03); }
+    .btn:active{ transform: translateY(1px); }
+    .btn[disabled]{ filter:grayscale(.2) brightness(.85); cursor:not-allowed; opacity:.9; }
+
+    .spinner{ 
+      width:18px; height:18px; border-radius:999px;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color:white; 
+      animation: spin 1s linear infinite; 
+      display:none; 
+    }
+    .btn.loading .spinner{ display:block; }
+
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    .result{
+      margin-top:18px;
+      background: linear-gradient(180deg, var(--mint-100), #fff);
+      border:1px solid rgba(21,78,39,.18);
+      border-radius:16px;
+      padding:16px 16px;
+    }
+
+    .result h3{
+      font-family: Merriweather, Georgia, serif; margin:0 0 8px 0; font-size:18px;
+      color:var(--forest-800);
+    }
+
+    .result pre{
+      margin:0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:15px; white-space:pre-wrap; word-break:break-word;
+    }
+
+    .footer{
+      text-align:center; padding:12px 16px 20px; color:var(--muted); font-size:12px;
+    }
+
+    .error{ color:var(--danger); font-weight:600; }
+  </style>
 </head>
 <body>
-  <h1>Buscar en Google Sheets</h1>
-  <input type="text" id="codigo" placeholder="Ingresa código">
-  <button onclick="buscar()">Buscar</button>
-  <p id="resultado"></p>
+  <main class="wrap">
+    <section class="card" role="region" aria-label="Acceso Marsella Lucerna">
+      <header class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <!-- Silueta de colibrí tomada de svgsilh.com (CC0) -->
+            <img src="https://svgsilh.com/svg/1221438.svg" alt="Silueta de colibrí" class="logo-mark" width="54" height="54" />
+          </div>
+          <h1>Acceso Marsella Lucerna</h1>
+          <small>Estatus Vecinal</small>
+        </div>
+      </header>
+
+      <div class="body">
+        <form class="form" id="formBusqueda" onsubmit="buscar(event)">
+          <div class="input">
+            <label for="codigo">Código a consultar</label>
+            <input id="codigo" name="codigo" type="text" placeholder="Ej. 13009780" autocomplete="off" required />
+          </div>
+          <button type="submit" id="btnBuscar" class="btn" aria-live="polite">
+            <div class="spinner" id="spinner" aria-hidden="true"></div>
+            <span id="btnText">Buscar</span>
+          </button>
+        </form>
+
+        <div class="result" id="resultado" hidden>
+          <h3>Resultado</h3>
+          <pre id="resultadoTexto">—</pre>
+        </div>
+
+        <p id="msg" class="error" style="margin-top:10px;" hidden></p>
+      </div>
+
+      <div class="footer">© <span id="year"></span> Acceso Marsella Lucerna</div>
+    </section>
+  </main>
 
   <script>
-    function buscar() {
-      var codigo = document.getElementById("codigo").value;
-      fetch("https://script.google.com/macros/s/AKfycbxXGdP3qeCTgnV_h9h1lrIORlWIxQAkTepI30IDygZgzL_rgixC6TCWqrSzDqFUASs-/exec?codigo=" + encodeURIComponent(codigo))
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById("resultado").textContent = data;
-        });
+  
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxXGdP3qeCTgnV_h9h1lrIORlWIxQAkTepI30IDygZgzL_rgixC6TCWqrSzDqFUASs-/exec";
+
+    const form = document.getElementById('formBusqueda');
+    const codigoInput = document.getElementById('codigo');
+    const btn = document.getElementById('btnBuscar');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+    const resultado = document.getElementById('resultado');
+    const resultadoTexto = document.getElementById('resultadoTexto');
+    const msg = document.getElementById('msg');
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function setLoading(isLoading){
+      if(isLoading){
+        btn.classList.add('loading');
+        btn.setAttribute('disabled', '');
+        btnText.textContent = 'Buscando…';
+      } else {
+        btn.classList.remove('loading');
+        btn.removeAttribute('disabled');
+        btnText.textContent = 'Buscar';
+      }
     }
+
+    async function buscar(e){
+      e?.preventDefault();
+      msg.hidden = true;
+      resultado.hidden = true;
+      const codigo = (codigoInput.value || '').trim();
+      if(!codigo){
+        msg.textContent = 'Escribe un código para buscar.';
+        msg.hidden = false;
+        return;
+      }
+      if(!WEBAPP_URL || WEBAPP_URL === 'TU_URL_WEBAPP'){
+        msg.textContent = 'Configura la URL de tu WebApp de Google Apps Script (WEBAPP_URL).';
+        msg.hidden = false;
+        return;
+      }
+
+      try{
+        setLoading(true);
+        const url = `${WEBAPP_URL}?codigo=${encodeURIComponent(codigo)}`;
+        const res = await fetch(url, { method:'GET', cache:'no-store' });
+        if(!res.ok){
+          throw new Error('Respuesta no válida (' + res.status + ').');
+        }
+        const text = await res.text();
+        resultadoTexto.textContent = text || 'Sin datos';
+        resultado.hidden = false;
+      }catch(err){
+        msg.textContent = 'Ocurrió un error: ' + err.message;
+        msg.hidden = false;
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    // Permitir Enter para disparar búsqueda (ya cubierto por submit) y limpiar mensajes al escribir
+    codigoInput.addEventListener('input', ()=>{ msg.hidden = true; });
   </script>
 </body>
 </html>
-
