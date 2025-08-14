@@ -195,17 +195,41 @@
       </header>
 
       <div class="body">
-        <form class="form" id="formBusqueda" onsubmit="buscar(event)">
-          <div class="input">
-            <label for="codigo">CÓDIGO</label>
-            <label for="codigo"> Marsella (MA) Toulouse (TO) Cannes (CA) Dijon (DI) Monaco (MO)</label>
-            <input id="codigo" name="codigo" type="text" placeholder="CODIGO+INTERIOR" autocomplete="off" required oninput="this.value = this.value.toUpperCase()"  />
-          </div>
-          <button type="submit" id="btnBuscar" class="btn" aria-live="polite">
-            <div class="spinner" id="spinner" aria-hidden="true"></div>
-            <span id="btnText">Buscar</span>
-          </button>
-        </form>
+       <form id="formBusqueda" onsubmit="buscar(event)">
+      
+      <!-- Radios ciudades -->
+      <fieldset>
+        <legend>Selecciona ciudad</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="ciudad" value="MA" required> Marsella</label>
+          <label><input type="radio" name="ciudad" value="TO"> Toulouse</label>
+          <label><input type="radio" name="ciudad" value="CA"> Cannes</label>
+          <label><input type="radio" name="ciudad" value="DI"> Dijon</label>
+          <label><input type="radio" name="ciudad" value="MO"> Monaco</label>
+        </div>
+      </fieldset>
+
+      <!-- Input numérico -->
+      <label for="codigo">Número</label>
+      <input id="codigo" name="codigo" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Solo números" required />
+
+      <!-- Radios opcionales -->
+      <fieldset>
+        <legend>Selecciona letra (opcional)</legend>
+        <div class="radio-group">
+          <label><input type="radio" name="letra" value="A"> A</label>
+          <label><input type="radio" name="letra" value="B"> B</label>
+          <label><input type="radio" name="letra" value="C"> C</label>
+          <label><input type="radio" name="letra" value="D"> D</label>
+          <label><input type="radio" name="letra" value="E"> E</label>
+          <label><input type="radio" name="letra" value="F"> F</label>
+          <label><input type="radio" name="letra" value="">SIN INTERIOR</label>
+        </div>
+      </fieldset>
+
+      <button type="submit" class="btn">Buscar</button>
+    </form>
+
 
         <div class="result" id="resultado" hidden>
           <h3>Resultado</h3>
@@ -220,25 +244,21 @@
   </main>
 
   <script>
-  const input = document.getElementById('codigo');
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_3Ldp7ZPHT0b7kqm9Gb8G_cxNr0or34AW7B75KiLvEZ5siUFdExfAHYoHvvZA2NGGcg/exec"; // <-- pon aquí tu URL del GAS
 
-  input.addEventListener('input', () => {
-  // Convierte a mayúsculas y permite solo A-Z y 0-9
-  input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-});
-    
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_3Ldp7ZPHT0b7kqm9Gb8G_cxNr0or34AW7B75KiLvEZ5siUFdExfAHYoHvvZA2NGGcg/exec";
-
-    const form = document.getElementById('formBusqueda');
+    const resultado = document.getElementById('resultado');
+    const resultadoTexto = document.getElementById('resultadoTexto');
+    const msg = document.getElementById('msg');
     const codigoInput = document.getElementById('codigo');
     const btn = document.getElementById('btnBuscar');
     const btnText = document.getElementById('btnText');
     const spinner = document.getElementById('spinner');
-    const resultado = document.getElementById('resultado');
-    const resultadoTexto = document.getElementById('resultadoTexto');
-    const msg = document.getElementById('msg');
 
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // Solo números en input
+    codigoInput.addEventListener('input', ()=>{ 
+      codigoInput.value = codigoInput.value.replace(/\D/g,''); 
+      msg.hidden = true; 
+    });
 
     function setLoading(isLoading){
       if(isLoading){
@@ -253,44 +273,51 @@
     }
 
     async function buscar(e){
-      e?.preventDefault();
+      e.preventDefault();
       msg.hidden = true;
       resultado.hidden = true;
-      const codigo = (codigoInput.value || '').trim();
-      if(!codigo){
-        msg.textContent = 'Escribe un código para buscar.';
-        msg.hidden = false;
-        return;
-      }
-      if(!WEBAPP_URL || WEBAPP_URL === 'TU_URL_WEBAPP'){
-        msg.textContent = 'Configura la URL de tu WebApp de Google Apps Script (WEBAPP_URL).';
+
+      const ciudad = document.querySelector('input[name="ciudad"]:checked')?.value;
+      const numero = codigoInput.value.trim();
+      const letra = document.querySelector('input[name="letra"]:checked')?.value || '';
+
+      if(!ciudad || !numero){
+        msg.textContent = 'Selecciona ciudad y escribe número.';
         msg.hidden = false;
         return;
       }
 
-      try{
-        setLoading(true);
-        const url = `${WEBAPP_URL}?codigo=${encodeURIComponent(codigo)}`;
-        const res = await fetch(url, { method:'GET', cache:'no-store' });
-        if(!res.ok){
-          throw new Error('Respuesta no válida (' + res.status + ').');
-        }
-        const text = await res.text();
-        resultadoTexto.textContent = text || 'Sin datos';
-        resultado.hidden = false;
-      }catch(err){
-        msg.textContent = 'Ocurrió un error: ' + err.message;
+      const codigoFinal = ciudad + numero + letra;
+      resultadoTexto.textContent = codigoFinal;
+      resultado.hidden = false;
+
+      // 🔹 Enviar a Google Apps Script
+      if(!WEBAPP_URL || WEBAPP_URL === "TU_URL_WEBAPP"){
+        msg.textContent = "Configura la URL de tu WebApp en la variable WEBAPP_URL.";
         msg.hidden = false;
-      }finally{
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const url = `${WEBAPP_URL}?codigo=${encodeURIComponent(codigoFinal)}`;
+        const res = await fetch(url, { method: "GET", cache: "no-store" });
+        if(!res.ok) throw new Error("Error en la respuesta: " + res.status);
+        const text = await res.text();
+        resultadoTexto.textContent = `${codigoFinal}\nRespuesta: ${text}`;
+      } catch(err){
+        msg.textContent = "Ocurrió un error: " + err.message;
+        msg.hidden = false;
+      } finally {
         setLoading(false);
       }
     }
-
     // Permitir Enter para disparar búsqueda (ya cubierto por submit) y limpiar mensajes al escribir
     codigoInput.addEventListener('input', ()=>{ msg.hidden = true; });
   </script>
 </body>
 </html>
+
 
 
 
