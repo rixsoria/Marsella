@@ -12,7 +12,7 @@
   <script>
     function buscar() {
       var codigo = document.getElementById("codigo").value;
-      fetch("TU_URL_WEBAPP?codigo=" + encodeURIComponent(codigo))
+      fetch("https://script.google.com/macros/s/AKfycbxXGdP3qeCTgnV_h9h1lrIORlWIxQAkTepI30IDygZgzL_rgixC6TCWqrSzDqFUASs-/exec?codigo=" + encodeURIComponent(codigo))
         .then(res => res.text())
         .then(data => {
           document.getElementById("resultado").textContent = data;
@@ -21,3 +21,4 @@
   </script>
 </body>
 </html>
+
