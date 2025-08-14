@@ -362,7 +362,7 @@ if (partes[1]?.toLowerCase() === "regular") colorEstatus = "forestgreen";
 if (partes.length >= 5) {
   resultadoTexto.innerHTML = `
     <table style="border-collapse:collapse; font-size:14px; line-height:1.3;">
-      <tr><td><strong>DIRECCIÓN:</strong></td><td>${partes[0]} ${numero} </td></tr>
+      <tr><td><strong>DIRECCIÓN:</strong></td><td>${partes[0]} ${numero} ${letra} </td></tr>
       <tr><td><strong>ESTATUS:</strong></td><td style="color:${colorEstatus}; font-weight:bold">${partes[1]}</td></tr>
       <tr><td><strong>PROPIETARIO:</strong></td><td>${partes[2]}</td></tr>
       <tr><td><strong>OPCIÓN 1:</strong></td><td>${partes[3]}</td></tr>
@@ -388,6 +388,7 @@ if (partes.length >= 5) {
   </script>
 </body>
 </html>
+
 
 
 
