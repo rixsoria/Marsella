@@ -290,7 +290,7 @@
   </main>
 
   <script>
-  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_3Ldp7ZPHT0b7kqm9Gb8G_cxNr0or34AW7B75KiLvEZ5siUFdExfAHYoHvvZA2NGGcg/exec"; // <-- pon aquí tu URL del GAS
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyt6okR8GFxTRdZAqiKK5sCBgDxre5ojrjdgc4ttDWDrqzP4WmHkfVXc14S1t1FYAeGZQ/exec"; // <-- pon aquí tu URL del GAS
 
     const resultado = document.getElementById('resultado');
     const resultadoTexto = document.getElementById('resultadoTexto');
@@ -344,27 +344,50 @@
         return;
       }
 
-      try {
-        setLoading(true);
-        const url = `${WEBAPP_URL}?codigo=${encodeURIComponent(codigoFinal)}`;
-        const res = await fetch(url, { method: "GET", cache: "no-store" });
-        if(!res.ok) throw new Error("Error en la respuesta: " + res.status);
-        const text = await res.text();
-        resultadoTexto.textContent = `${codigoFinal}\nRespuesta: ${text}`;
-      } catch(err){
-        msg.textContent = "Ocurrió un error: " + err.message;
-        msg.hidden = false;
-      } finally {
-        setLoading(false);
-        document.getElementById("formBusqueda").reset();
-      }
+     try {
+  setLoading(true);
+  const url = `${WEBAPP_URL}?codigo=${encodeURIComponent(codigoFinal)}`;
+  const res = await fetch(url, { method: "GET", cache: "no-store" });
+  if(!res.ok) throw new Error("Error en la respuesta: " + res.status);
+  const text = await res.text();
+
+  // Separar resultado en partes
+const partes = text.split("|").map(p => p.trim());
+
+// Detectar color para el estatus
+let colorEstatus = "black";
+if (partes[1]?.toLowerCase() === "moroso") colorEstatus = "indianred";
+if (partes[1]?.toLowerCase() === "regular") colorEstatus = "forestgreen";
+
+if (partes.length >= 5) {
+  resultadoTexto.innerHTML = `
+    <table style="border-collapse:collapse; font-size:14px; line-height:1.3;">
+      <tr><td><strong>DIRECCIÓN:</strong></td><td>${partes[0]}</td></tr>
+      <tr><td><strong>ESTATUS:</strong></td><td style="color:${colorEstatus}; font-weight:bold">${partes[1]}</td></tr>
+      <tr><td><strong>PROPIETARIO:</strong></td><td>${partes[2]}</td></tr>
+      <tr><td><strong>OPCIÓN 1:</strong></td><td>${partes[3]}</td></tr>
+      <tr><td><strong>OPCIÓN 2:</strong></td><td>${partes[4]}</td></tr>
+    </table>
+  `;
+} else {
+  resultadoTexto.textContent = `${codigoFinal}\nRespuesta: ${text}`;
+}
+
+} catch(err) {
+  msg.textContent = "Ocurrió un error: " + err.message;
+  msg.hidden = false;
+} finally {
+  setLoading(false);
+  document.getElementById("formBusqueda").reset();
+}
+
     }
     // Permitir Enter para disparar búsqueda (ya cubierto por submit) y limpiar mensajes al escribir
     codigoInput.addEventListener('input', ()=>{ msg.hidden = true; });
+    
   </script>
 </body>
 </html>
-
 
 
 
