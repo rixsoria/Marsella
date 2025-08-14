@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Buscador</title>
+</head>
+<body>
+  <h1>Buscar en Google Sheets</h1>
+  <input type="text" id="codigo" placeholder="Ingresa código">
+  <button onclick="buscar()">Buscar</button>
+  <p id="resultado"></p>
+
+  <script>
+    function buscar() {
+      var codigo = document.getElementById("codigo").value;
+      fetch("TU_URL_WEBAPP?codigo=" + encodeURIComponent(codigo))
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById("resultado").textContent = data;
+        });
+    }
+  </script>
+</body>
+</html>
