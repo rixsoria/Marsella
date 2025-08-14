@@ -220,7 +220,13 @@
   </main>
 
   <script>
-  
+  const input = document.getElementById('codigo');
+
+  input.addEventListener('input', () => {
+  // Convierte a mayúsculas y permite solo A-Z y 0-9
+  input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+    
     const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_3Ldp7ZPHT0b7kqm9Gb8G_cxNr0or34AW7B75KiLvEZ5siUFdExfAHYoHvvZA2NGGcg/exec";
 
     const form = document.getElementById('formBusqueda');
@@ -285,6 +291,7 @@
   </script>
 </body>
 </html>
+
 
 
 
